@@ -18,12 +18,12 @@ const news: NewsItem[] = [
 const styles: Record<NewsItem["type"], { label: string; classes: string; icon: JSX.Element }> = {
   info: {
     label: "Info",
-    classes: "bg-medical-50 text-medical-600 dark:bg-medical-500/10 dark:text-medical-400",
+    classes: "bg-medical-50 text-medical-600",
     icon: <Info className="h-3.5 w-3.5" />,
   },
   academique: {
     label: "Académique",
-    classes: "bg-navy-100 text-navy-900 dark:bg-white/10 dark:text-white",
+    classes: "bg-navy-100 text-navy-900",
     icon: <GraduationCap className="h-3.5 w-3.5" />,
   },
   urgent: {
@@ -36,7 +36,7 @@ const styles: Record<NewsItem["type"], { label: string; classes: string; icon: J
 export function NewsTicker() {
   const doubled = [...news, ...news];
   return (
-    <div className="group relative overflow-hidden border-b border-navy-900/10 bg-white/70 py-2.5 backdrop-blur dark:border-white/10 dark:bg-navy-900/70">
+    <div className="group relative overflow-hidden border-b border-medical-100 bg-white py-2.5">
       <div className="flex w-max animate-marquee gap-10 group-hover:[animation-play-state:paused]">
         {doubled.map((item, i) => {
           const s = styles[item.type];
@@ -46,7 +46,7 @@ export function NewsTicker() {
                 {s.icon}
                 {s.label}
               </span>
-              <span className={item.type === "urgent" ? "font-semibold text-red-600 dark:text-red-400" : "text-navy-900/80 dark:text-white/80"}>
+              <span className={item.type === "urgent" ? "font-semibold text-red-600" : "text-navy-900/75"}>
                 {item.text}
               </span>
             </div>
