@@ -6,7 +6,8 @@ export default function PediatriePage() {
     <ServicePage
       title="Pédiatrie Médicale"
       tag="Service clinique — EPHR San Pedro"
-      icon={Baby}
+      icon={<Baby className="h-7 w-7" />}
+
       intro="Le service de Pédiatrie Médicale assure la prise en charge médicale des enfants et des nourrissons, de la naissance à l'adolescence."
       activities={[
         "Consultations pédiatriques générales",
