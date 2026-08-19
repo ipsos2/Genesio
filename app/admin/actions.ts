@@ -19,27 +19,35 @@ export async function fetchAdminData() {
 }
 
 export async function addNewsItem(type: string, text: string) {
-  if (!text) return;
-  await supabaseAdmin.from("news_items").insert({ type, text });
+  if (!text) return { error: "Texte manquant" };
+  const { error } = await supabaseAdmin.from("news_items").insert({ type, text });
+  if (error) return { error: error.message };
   revalidatePath("/");
   revalidatePath("/admin");
+  return { error: null };
 }
 
 export async function deleteNewsItem(id: string) {
-  await supabaseAdmin.from("news_items").delete().eq("id", id);
+  const { error } = await supabaseAdmin.from("news_items").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/");
   revalidatePath("/admin");
+  return { error: null };
 }
 
 export async function addCalendarEvent(event_date: string, label: string, tone: string) {
-  if (!event_date || !label) return;
-  await supabaseAdmin.from("calendar_events").insert({ event_date, label, tone });
+  if (!event_date || !label) return { error: "Champs manquants" };
+  const { error } = await supabaseAdmin.from("calendar_events").insert({ event_date, label, tone });
+  if (error) return { error: error.message };
   revalidatePath("/");
   revalidatePath("/admin");
+  return { error: null };
 }
 
 export async function deleteCalendarEvent(id: string) {
-  await supabaseAdmin.from("calendar_events").delete().eq("id", id);
+  const { error } = await supabaseAdmin.from("calendar_events").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/");
   revalidatePath("/admin");
+  return { error: null };
 }
