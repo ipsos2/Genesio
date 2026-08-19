@@ -1,19 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, ClipboardList, Users2, type LucideIcon } from "lucide-react";
+import { CheckCircle2, ClipboardList, Users2 } from "lucide-react";
+import type { ReactNode } from "react";
 
 type ServicePageProps = {
   title: string;
   tag: string;
-  icon: LucideIcon;
+  icon: ReactNode;
   intro: string;
   activities: string[];
   stageOrg: string;
   integrationSteps: string[];
 };
 
-export function ServicePage({ title, tag, icon: Icon, intro, activities, stageOrg, integrationSteps }: ServicePageProps) {
+export function ServicePage({ title, tag, icon, intro, activities, stageOrg, integrationSteps }: ServicePageProps) {
   return (
     <>
       {/* HERO */}
@@ -22,7 +23,7 @@ export function ServicePage({ title, tag, icon: Icon, intro, activities, stageOr
         <div className="container-page relative py-20 lg:py-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl">
             <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-medical-50 text-medical-600">
-              <Icon className="h-7 w-7" />
+              {icon}
             </div>
             <span className="inline-flex items-center rounded-full bg-medical-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-medical-600">
               {tag}
