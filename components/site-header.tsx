@@ -28,7 +28,8 @@ export function SiteHeader() {
 
       <div className="container-page flex items-center justify-between border-b border-medical-100 py-3.5">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/logo-usp.png" alt="Logo UPSP" width={42} height={42} className="object-contain" />
+          <Image src="/logo-usp.PNG" alt="Logo UPSP" width={42} height={42} className="object-contain" />
+
           <div className="leading-tight">
             <p className="text-sm font-bold text-navy-900">UFR Sciences de la Santé</p>
             <p className="text-[11px] text-navy-900/50">Université Polytechnique de San Pedro</p>
