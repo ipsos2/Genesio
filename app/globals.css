@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', 'Plus Jakarta Sans', sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-softgray text-navy-900 dark:bg-navy-900 dark:text-softgray;
+    font-family: var(--font-sans);
+  }
+  ::selection {
+    @apply bg-medical-500 text-white;
+  }
+}
+
+@layer utilities {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-6 lg:px-10;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
