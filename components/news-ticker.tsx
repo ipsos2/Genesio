@@ -2,18 +2,11 @@
 
 import { AlertTriangle, GraduationCap, Info } from "lucide-react";
 
-type NewsItem = {
+export type NewsItem = {
+  id?: string;
   type: "info" | "academique" | "urgent";
   text: string;
 };
-
-const news: NewsItem[] = [
-  { type: "urgent", text: "Report de la clôture des inscriptions au 30 septembre" },
-  { type: "academique", text: "Rentrée académique Doctorat 1 fixée au 15 octobre" },
-  { type: "info", text: "Journée Santé du campus le 12 novembre — inscriptions ouvertes" },
-  { type: "academique", text: "Publication du calendrier des stages EPHR — voir Calendrier Universitaire" },
-  { type: "info", text: "Réunion de la délégation Promotion Genèse le mercredi 18h" },
-];
 
 const styles: Record<NewsItem["type"], { label: string; classes: string; icon: JSX.Element }> = {
   info: {
@@ -33,8 +26,9 @@ const styles: Record<NewsItem["type"], { label: string; classes: string; icon: J
   },
 };
 
-export function NewsTicker() {
-  const doubled = [...news, ...news];
+export function NewsTicker({ items }: { items: NewsItem[] }) {
+  if (!items || items.length === 0) return null;
+  const doubled = [...items, ...items];
   return (
     <div className="group relative overflow-hidden border-b border-medical-100 bg-white py-2.5">
       <div className="flex w-max animate-marquee gap-10 group-hover:[animation-play-state:paused]">
