@@ -6,7 +6,8 @@ export default function MedecinePage() {
     <ServicePage
       title="Médecine"
       tag="Service clinique — EPHR San Pedro"
-      icon={Stethoscope}
+      icon={<Stethoscope className="h-7 w-7" />}
+
       intro="Le service de Médecine assure les consultations générales et la prise en charge des pathologies médicales courantes et chroniques des patients de la région de San Pedro."
       activities={[
         "Consultations médicales générales",
