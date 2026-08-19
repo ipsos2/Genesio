@@ -4,6 +4,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { fetchNewsItems } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "UFR Sciences de la Santé — Université Polytechnique de San Pedro",
   description:
