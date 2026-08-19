@@ -20,6 +20,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [actionError, setActionError] = useState("");
 
   const [news, setNews] = useState<NewsRow[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
@@ -59,14 +60,24 @@ export default function AdminPage() {
 
   async function handleAddNews() {
     if (!newsText.trim()) return;
-    await addNewsItem(newsType, newsText);
+    setActionError("");
+    const res = await addNewsItem(newsType, newsText);
+    if (res?.error) {
+      setActionError(res.error);
+      return;
+    }
     setNewsText("");
     loadData();
   }
 
   async function handleAddEvent() {
     if (!eventDate || !eventLabel.trim()) return;
-    await addCalendarEvent(eventDate, eventLabel, eventTone);
+    setActionError("");
+    const res = await addCalendarEvent(eventDate, eventLabel, eventTone);
+    if (res?.error) {
+      setActionError(res.error);
+      return;
+    }
     setEventLabel("");
     setEventDate("");
     loadData();
@@ -97,9 +108,14 @@ export default function AdminPage() {
 
   return (
     <div className="container-page py-14">
-      <h1 className="mb-10 text-3xl font-bold text-navy-900">Dashboard — Page d&rsquo;accueil</h1>
+      <h1 className="mb-6 text-3xl font-bold text-navy-900">Dashboard — Page d&rsquo;accueil</h1>
 
       {loading && <p className="mb-6 text-sm text-navy-900/50">Chargement...</p>}
+      {actionError && (
+        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          Erreur Supabase : {actionError}
+        </div>
+      )}
 
       {/* NEWS */}
       <section className="mb-14 rounded-2xl border border-medical-100 bg-white p-7">
