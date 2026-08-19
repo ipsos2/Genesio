@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { NewsTicker } from "@/components/news-ticker";
+import { NewsTicker, type NewsItem } from "@/components/news-ticker";
 
 const links = [
   { href: "/", label: "Accueil" },
@@ -15,7 +15,7 @@ const links = [
   { href: "/calendrier-universitaire", label: "Calendrier Universitaire" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ newsItems }: { newsItems: NewsItem[] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -24,12 +24,11 @@ export function SiteHeader() {
         République de Côte d&rsquo;Ivoire — Union · Discipline · Travail
       </div>
 
-      <NewsTicker />
+      <NewsTicker items={newsItems} />
 
       <div className="container-page flex items-center justify-between border-b border-medical-100 py-3.5">
         <Link href="/" className="flex items-center gap-3">
           <Image src="/logo-usp.PNG" alt="Logo UPSP" width={42} height={42} className="object-contain" />
-
           <div className="leading-tight">
             <p className="text-sm font-bold text-navy-900">UFR Sciences de la Santé</p>
             <p className="text-[11px] text-navy-900/50">Université Polytechnique de San Pedro</p>
