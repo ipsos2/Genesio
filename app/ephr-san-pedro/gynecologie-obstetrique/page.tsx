@@ -6,7 +6,8 @@ export default function GynecoPage() {
     <ServicePage
       title="Gynécologie-Obstétrique"
       tag="Service clinique — EPHR San Pedro"
-      icon={HeartPulse}
+      icon={<HeartPulse className="h-7 w-7" />}
+
       intro="Le service de Gynécologie-Obstétrique assure le suivi de grossesse, les accouchements et la prise en charge de la santé de la femme."
       activities={[
         "Consultations prénatales et suivi de grossesse",
