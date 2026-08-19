@@ -20,7 +20,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/85 backdrop-blur dark:bg-navy-900/85">
-      <div className="border-b border-navy-900/10 bg-navy-900 py-1.5 text-center text-[11px] font-medium uppercase tracking-wider text-white/80 dark:border-white/10">
+      <div className="border-b border-medical-600/20 bg-medical-600 py-1.5 text-center text-[11px] font-medium uppercase tracking-wider text-white">
         République de Côte d&rsquo;Ivoire — Union · Discipline · Travail
       </div>
 
