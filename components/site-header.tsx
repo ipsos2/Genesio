@@ -19,19 +19,19 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/85 backdrop-blur dark:bg-navy-900/85">
-      <div className="border-b border-medical-600/20 bg-medical-600 py-1.5 text-center text-[11px] font-medium uppercase tracking-wider text-white">
+    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur">
+      <div className="border-b border-medical-100 bg-medical-50 py-1.5 text-center text-[11px] font-medium uppercase tracking-wider text-medical-700">
         République de Côte d&rsquo;Ivoire — Union · Discipline · Travail
       </div>
 
       <NewsTicker />
 
-      <div className="container-page flex items-center justify-between py-3.5">
+      <div className="container-page flex items-center justify-between border-b border-medical-100 py-3.5">
         <Link href="/" className="flex items-center gap-3">
           <Image src="/logo-usp.png" alt="Logo UPSP" width={42} height={42} className="object-contain" />
           <div className="leading-tight">
-            <p className="text-sm font-bold text-navy-900 dark:text-white">UFR Sciences de la Santé</p>
-            <p className="text-[11px] text-navy-900/60 dark:text-white/60">Université Polytechnique de San Pedro</p>
+            <p className="text-sm font-bold text-navy-900">UFR Sciences de la Santé</p>
+            <p className="text-[11px] text-navy-900/50">Université Polytechnique de San Pedro</p>
           </div>
         </Link>
 
@@ -40,7 +40,7 @@ export function SiteHeader() {
             <Link
               key={l.href}
               href={l.href}
-              className="rounded-full px-4 py-2 text-sm font-medium text-navy-900/80 transition-colors hover:bg-medical-50 hover:text-medical-600 dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-full px-4 py-2 text-sm font-medium text-navy-900/75 transition-colors hover:bg-medical-50 hover:text-medical-600"
             >
               {l.label}
             </Link>
@@ -55,7 +55,7 @@ export function SiteHeader() {
         </div>
 
         <button
-          className="flex h-10 w-10 items-center justify-center rounded-full text-navy-900 lg:hidden dark:text-white"
+          className="flex h-10 w-10 items-center justify-center rounded-full text-navy-900 lg:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Ouvrir le menu"
         >
@@ -64,14 +64,14 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div className="border-t border-navy-900/10 bg-white px-6 pb-6 lg:hidden dark:border-white/10 dark:bg-navy-900">
+        <div className="border-b border-medical-100 bg-white px-6 pb-6 lg:hidden">
           <nav className="flex flex-col gap-1 pt-2">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-navy-900 hover:bg-medical-50 dark:text-white dark:hover:bg-white/10"
+                className="rounded-lg px-3 py-3 text-sm font-medium text-navy-900 hover:bg-medical-50"
               >
                 {l.label}
               </Link>
