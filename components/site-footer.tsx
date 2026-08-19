@@ -2,17 +2,17 @@ import Link from "next/link";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-navy-900/10 bg-navy-900 text-white/80 dark:border-white/10">
+    <footer className="border-t border-medical-600/20 bg-medical-600 text-white/85">
       <div className="container-page grid gap-10 py-14 lg:grid-cols-3">
         <div>
           <p className="text-base font-bold text-white">UFR Sciences de la Santé</p>
-          <p className="mt-2 text-sm text-white/60">
+          <p className="mt-2 text-sm text-white/70">
             Université Polytechnique de San Pedro — San Pedro, Côte d&rsquo;Ivoire
           </p>
         </div>
         <div>
           <p className="text-sm font-semibold text-white">Navigation</p>
-          <div className="mt-3 flex flex-col gap-2 text-sm text-white/60">
+          <div className="mt-3 flex flex-col gap-2 text-sm text-white/70">
             <Link href="/ufr-sciences-de-la-sante" className="hover:text-white">UFR Sciences de la Santé</Link>
             <Link href="/ephr-san-pedro" className="hover:text-white">EPHR de San Pedro</Link>
             <Link href="/calendrier-universitaire" className="hover:text-white">Calendrier Universitaire</Link>
@@ -21,10 +21,10 @@ export function SiteFooter() {
         </div>
         <div>
           <p className="text-sm font-semibold text-white">Promotion Genèse</p>
-          <p className="mt-3 text-sm text-white/60">Doctorat en Médecine, D1 — 34 étudiants</p>
+          <p className="mt-3 text-sm text-white/70">Doctorat en Médecine, D1 — 34 étudiants</p>
         </div>
       </div>
-      <div className="border-t border-white/10 py-5 text-center text-xs text-white/40">
+      <div className="border-t border-white/20 py-5 text-center text-xs text-white/60">
         © {new Date().getFullYear()} UFR Sciences de la Santé · UPSP. Tous droits réservés.
       </div>
     </footer>
