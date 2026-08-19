@@ -28,7 +28,7 @@ const styles: Record<NewsItem["type"], { label: string; classes: string; icon: J
   },
   urgent: {
     label: "Urgent",
-    classes: "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400",
+    classes: "bg-red-600 text-white",
     icon: <AlertTriangle className="h-3.5 w-3.5" />,
   },
 };
@@ -46,7 +46,9 @@ export function NewsTicker() {
                 {s.icon}
                 {s.label}
               </span>
-              <span className="text-navy-900/80 dark:text-white/80">{item.text}</span>
+              <span className={item.type === "urgent" ? "font-semibold text-red-600 dark:text-red-400" : "text-navy-900/80 dark:text-white/80"}>
+                {item.text}
+              </span>
             </div>
           );
         })}
