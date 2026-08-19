@@ -6,7 +6,8 @@ export default function ChirurgiePage() {
     <ServicePage
       title="Chirurgie"
       tag="Service clinique — EPHR San Pedro"
-      icon={Scissors}
+      icon={<Scissors className="h-7 w-7" />}
+
       intro="Le service de Chirurgie prend en charge les interventions chirurgicales programmées et urgentes, ainsi que le suivi post-opératoire des patients."
       activities={[
         "Consultations pré-opératoires",
