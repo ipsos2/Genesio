@@ -17,9 +17,17 @@ import {
 } from "./actions";
 
 type NewsRow = { id: string; type: string; text: string };
-type EventRow = { id: string; event_date: string; label: string; tone: string };
+type EventRow = { id: string; event_date: string; end_date: string | null; label: string; level: string; category: string };
 type TeacherRow = { id: string; name: string; grade: string; discipline: string; service: string; email: string };
 type GovRow = { id: string; role: string; name: string; position: number };
+
+const levels = ["Toutes", "Licence 1", "Licence 2", "Licence 3", "Doctorat 1", "Doctorat 2", "Internat"];
+const categories = [
+  { value: "rentree", label: "Rentrée" },
+  { value: "stage", label: "Stage" },
+  { value: "examen", label: "Examen" },
+  { value: "conge", label: "Congé" },
+];
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -37,8 +45,10 @@ export default function AdminPage() {
   const [newsText, setNewsText] = useState("");
 
   const [eventDate, setEventDate] = useState("");
+  const [eventEndDate, setEventEndDate] = useState("");
   const [eventLabel, setEventLabel] = useState("");
-  const [eventTone, setEventTone] = useState("info");
+  const [eventLevel, setEventLevel] = useState("Toutes");
+  const [eventCategory, setEventCategory] = useState("rentree");
 
   const [tName, setTName] = useState("");
   const [tGrade, setTGrade] = useState("Assistant");
@@ -90,10 +100,9 @@ export default function AdminPage() {
   async function handleAddEvent() {
     if (!eventDate || !eventLabel.trim()) return;
     setActionError("");
-    const res = await addCalendarEvent(eventDate, eventLabel, eventTone);
+    const res = await addCalendarEvent(eventDate, eventEndDate, eventLabel, eventLevel, eventCategory);
     if (res?.error) return setActionError(res.error);
-    setEventLabel("");
-    setEventDate("");
+    setEventLabel(""); setEventDate(""); setEventEndDate("");
     loadData();
   }
 
@@ -174,21 +183,33 @@ export default function AdminPage() {
 
       {/* CALENDAR */}
       <section className="mb-10 rounded-2xl border border-medical-100 bg-white p-7">
-        <h2 className="mb-5 text-xl font-bold text-navy-900">Dates du calendrier (aperçu accueil)</h2>
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-          <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm" />
-          <input value={eventLabel} onChange={(e) => setEventLabel(e.target.value)} placeholder="Libellé de l'événement" className="flex-1 rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
-          <select value={eventTone} onChange={(e) => setEventTone(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm">
-            <option value="info">Info</option>
-            <option value="academique">Académique</option>
-            <option value="urgent">Examen</option>
+        <h2 className="mb-5 text-xl font-bold text-navy-900">Calendrier universitaire</h2>
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-xs text-navy-900/50">Date de début</label>
+            <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="w-full rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-navy-900/50">Date de fin (optionnel)</label>
+            <input type="date" value={eventEndDate} onChange={(e) => setEventEndDate(e.target.value)} className="w-full rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm" />
+          </div>
+          <input value={eventLabel} onChange={(e) => setEventLabel(e.target.value)} placeholder="Libellé de l'événement" className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500 sm:col-span-2" />
+          <select value={eventLevel} onChange={(e) => setEventLevel(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm">
+            {levels.map((l) => <option key={l}>{l}</option>)}
           </select>
-          <Button onClick={handleAddEvent}>Ajouter</Button>
+          <select value={eventCategory} onChange={(e) => setEventCategory(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm">
+            {categories.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </select>
+          <Button onClick={handleAddEvent} className="sm:col-span-2">Ajouter</Button>
         </div>
         <ul className="flex flex-col divide-y divide-navy-900/10">
           {events.map((e) => (
             <li key={e.id} className="flex items-center justify-between gap-4 py-3">
-              <div><span className="mr-3 text-xs font-semibold text-navy-900/50">{e.event_date}</span><span className="text-sm text-navy-900/85">{e.label}</span></div>
+              <div>
+                <span className="mr-3 text-xs font-semibold text-navy-900/50">{e.event_date}{e.end_date ? ` → ${e.end_date}` : ""}</span>
+                <span className="text-sm text-navy-900/85">{e.label}</span>
+                <span className="ml-2 text-xs text-medical-600">({e.level} — {e.category})</span>
+              </div>
               <button onClick={() => deleteCalendarEvent(e.id).then(loadData)} className="text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
             </li>
           ))}
@@ -200,7 +221,7 @@ export default function AdminPage() {
       <section className="mb-10 rounded-2xl border border-medical-100 bg-white p-7">
         <h2 className="mb-5 text-xl font-bold text-navy-900">Gouvernance (page UFR)</h2>
         <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-          <input value={gRole} onChange={(e) => setGRole(e.target.value)} placeholder="Fonction (ex: Vice-Doyen...)" className="flex-1 rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
+          <input value={gRole} onChange={(e) => setGRole(e.target.value)} placeholder="Fonction" className="flex-1 rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
           <input value={gName} onChange={(e) => setGName(e.target.value)} placeholder="Nom" className="flex-1 rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
           <input type="number" value={gPosition} onChange={(e) => setGPosition(e.target.value)} placeholder="Ordre" className="w-24 rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm" />
           <Button onClick={handleAddGovernance}>Ajouter</Button>
@@ -235,10 +256,7 @@ export default function AdminPage() {
         <ul className="flex flex-col divide-y divide-navy-900/10">
           {teachers.map((t) => (
             <li key={t.id} className="flex items-center justify-between gap-4 py-3">
-              <div>
-                <span className="text-sm font-medium text-navy-900">{t.name}</span>
-                <span className="ml-2 text-xs text-navy-900/50">— {t.grade}, {t.discipline}</span>
-              </div>
+              <div><span className="text-sm font-medium text-navy-900">{t.name}</span><span className="ml-2 text-xs text-navy-900/50">— {t.grade}, {t.discipline}</span></div>
               <button onClick={() => deleteTeacher(t.id).then(loadData)} className="text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
             </li>
           ))}
