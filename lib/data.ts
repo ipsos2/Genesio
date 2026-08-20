@@ -10,8 +10,11 @@ export type NewsItem = {
 export type CalendarEvent = {
   id: string;
   event_date: string;
+  end_date: string | null;
   label: string;
   tone: "info" | "academique" | "urgent";
+  level: string;
+  category: "rentree" | "stage" | "examen" | "conge";
 };
 
 export type Teacher = {
@@ -42,7 +45,7 @@ export async function fetchNewsItems(): Promise<NewsItem[]> {
 export async function fetchCalendarEvents(): Promise<CalendarEvent[]> {
   const { data, error } = await supabase
     .from("calendar_events")
-    .select("id, event_date, label, tone")
+    .select("id, event_date, end_date, label, tone, level, category")
     .order("event_date", { ascending: true });
   if (error || !data) return [];
   return data as CalendarEvent[];
