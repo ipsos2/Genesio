@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Trash2, Lock } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Trash2, Lock, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   checkAdminPassword,
@@ -14,20 +14,27 @@ import {
   deleteTeacher,
   addGovernanceRow,
   deleteGovernanceRow,
+  addCourseFile,
+  deleteCourseFile,
+  addFaqItem,
+  deleteFaqItem,
 } from "./actions";
 
 type NewsRow = { id: string; type: string; text: string };
 type EventRow = { id: string; event_date: string; end_date: string | null; label: string; level: string; category: string };
 type TeacherRow = { id: string; name: string; grade: string; discipline: string; service: string; email: string };
 type GovRow = { id: string; role: string; name: string; position: number };
+type CourseRow = { id: string; level: string; ue: string; module: string; title: string; file_url: string };
+type FaqRow = { id: string; category: string; question: string; answer: string; position: number };
 
-const levels = ["Toutes", "Licence 1", "Licence 2", "Licence 3", "Doctorat 1", "Doctorat 2", "Internat"];
+const levels = ["Licence 1", "Licence 2", "Licence 3", "Doctorat 1", "Doctorat 2", "Internat"];
 const categories = [
   { value: "rentree", label: "Rentrée" },
   { value: "stage", label: "Stage" },
   { value: "examen", label: "Examen" },
   { value: "conge", label: "Congé" },
 ];
+const faqCategories = ["UFR & Admission", "Vie universitaire & Campus", "CROU (Logement & Restauration)", "EPHR (Stages)", "Ville de San Pedro"];
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -35,11 +42,14 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const [news, setNews] = useState<NewsRow[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [teachers, setTeachers] = useState<TeacherRow[]>([]);
   const [governance, setGovernance] = useState<GovRow[]>([]);
+  const [courses, setCourses] = useState<CourseRow[]>([]);
+  const [faqs, setFaqs] = useState<FaqRow[]>([]);
 
   const [newsType, setNewsType] = useState("info");
   const [newsText, setNewsText] = useState("");
@@ -60,6 +70,17 @@ export default function AdminPage() {
   const [gName, setGName] = useState("");
   const [gPosition, setGPosition] = useState("0");
 
+  const [cLevel, setCLevel] = useState(levels[0]);
+  const [cUe, setCUe] = useState("");
+  const [cModule, setCModule] = useState("");
+  const [cTitle, setCTitle] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [fCategory, setFCategory] = useState(faqCategories[0]);
+  const [fQuestion, setFQuestion] = useState("");
+  const [fAnswer, setFAnswer] = useState("");
+  const [fPosition, setFPosition] = useState("0");
+
   async function loadData() {
     setLoading(true);
     const data = await fetchAdminData();
@@ -67,6 +88,8 @@ export default function AdminPage() {
     setEvents(data.events as EventRow[]);
     setTeachers(data.teachers as TeacherRow[]);
     setGovernance(data.governance as GovRow[]);
+    setCourses(data.courses as CourseRow[]);
+    setFaqs(data.faq as FaqRow[]);
     setLoading(false);
   }
 
@@ -124,6 +147,37 @@ export default function AdminPage() {
     loadData();
   }
 
+  async function handleAddCourse() {
+    const file = fileInputRef.current?.files?.[0];
+    if (!cUe.trim() || !cModule.trim() || !cTitle.trim() || !file) {
+      setActionError("Remplis tous les champs et choisis un fichier");
+      return;
+    }
+    setActionError("");
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("level", cLevel);
+    formData.append("ue", cUe);
+    formData.append("module", cModule);
+    formData.append("title", cTitle);
+    formData.append("file", file);
+    const res = await addCourseFile(formData);
+    setUploading(false);
+    if (res?.error) return setActionError(res.error);
+    setCUe(""); setCModule(""); setCTitle("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    loadData();
+  }
+
+  async function handleAddFaq() {
+    if (!fQuestion.trim() || !fAnswer.trim()) return;
+    setActionError("");
+    const res = await addFaqItem(fCategory, fQuestion, fAnswer, parseInt(fPosition || "0", 10));
+    if (res?.error) return setActionError(res.error);
+    setFQuestion(""); setFAnswer(""); setFPosition("0");
+    loadData();
+  }
+
   if (!authed) {
     return (
       <div className="container-page flex min-h-[70vh] items-center justify-center">
@@ -154,7 +208,7 @@ export default function AdminPage() {
       {loading && <p className="mb-6 text-sm text-navy-900/50">Chargement...</p>}
       {actionError && (
         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          Erreur Supabase : {actionError}
+          Erreur : {actionError}
         </div>
       )}
 
@@ -195,6 +249,7 @@ export default function AdminPage() {
           </div>
           <input value={eventLabel} onChange={(e) => setEventLabel(e.target.value)} placeholder="Libellé de l'événement" className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500 sm:col-span-2" />
           <select value={eventLevel} onChange={(e) => setEventLevel(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm">
+            <option>Toutes</option>
             {levels.map((l) => <option key={l}>{l}</option>)}
           </select>
           <select value={eventCategory} onChange={(e) => setEventCategory(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm">
@@ -238,7 +293,7 @@ export default function AdminPage() {
       </section>
 
       {/* TEACHERS */}
-      <section className="rounded-2xl border border-medical-100 bg-white p-7">
+      <section className="mb-10 rounded-2xl border border-medical-100 bg-white p-7">
         <h2 className="mb-5 text-xl font-bold text-navy-900">Corps Enseignant (page UFR)</h2>
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <input value={tName} onChange={(e) => setTName(e.target.value)} placeholder="Nom complet" className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
@@ -261,6 +316,59 @@ export default function AdminPage() {
             </li>
           ))}
           {teachers.length === 0 && <p className="py-3 text-sm text-navy-900/40">Aucun enseignant.</p>}
+        </ul>
+      </section>
+
+      {/* COURSES */}
+      <section className="mb-10 rounded-2xl border border-medical-100 bg-white p-7">
+        <h2 className="mb-5 text-xl font-bold text-navy-900">Banque de cours (Espace Étudiant)</h2>
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <select value={cLevel} onChange={(e) => setCLevel(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm">
+            {levels.map((l) => <option key={l}>{l}</option>)}
+          </select>
+          <input value={cUe} onChange={(e) => setCUe(e.target.value)} placeholder="UE" className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
+          <input value={cModule} onChange={(e) => setCModule(e.target.value)} placeholder="Module" className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
+          <input value={cTitle} onChange={(e) => setCTitle(e.target.value)} placeholder="Titre du fichier" className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
+          <input ref={fileInputRef} type="file" accept=".pdf,.ppt,.pptx" className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm sm:col-span-2" />
+          <Button onClick={handleAddCourse} disabled={uploading} className="sm:col-span-2">
+            <Upload className="h-4 w-4" /> {uploading ? "Envoi en cours..." : "Ajouter le fichier"}
+          </Button>
+        </div>
+        <ul className="flex flex-col divide-y divide-navy-900/10">
+          {courses.map((c) => (
+            <li key={c.id} className="flex items-center justify-between gap-4 py-3">
+              <div><span className="text-sm font-medium text-navy-900">{c.title}</span><span className="ml-2 text-xs text-navy-900/50">— {c.level} / {c.ue} / {c.module}</span></div>
+              <button onClick={() => deleteCourseFile(c.id).then(loadData)} className="text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
+            </li>
+          ))}
+          {courses.length === 0 && <p className="py-3 text-sm text-navy-900/40">Aucun cours ajouté.</p>}
+        </ul>
+      </section>
+
+      {/* FAQ */}
+      <section className="rounded-2xl border border-medical-100 bg-white p-7">
+        <h2 className="mb-5 text-xl font-bold text-navy-900">FAQ (futurs étudiants)</h2>
+        <div className="mb-6 grid gap-3">
+          <select value={fCategory} onChange={(e) => setFCategory(e.target.value)} className="rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm">
+            {faqCategories.map((c) => <option key={c}>{c}</option>)}
+          </select>
+          <input value={fQuestion} onChange={(e) => setFQuestion(e.target.value)} placeholder="Question" className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
+          <textarea value={fAnswer} onChange={(e) => setFAnswer(e.target.value)} placeholder="Réponse" rows={3} className="rounded-lg border border-navy-900/15 px-4 py-2.5 text-sm outline-none focus:border-medical-500" />
+          <input type="number" value={fPosition} onChange={(e) => setFPosition(e.target.value)} placeholder="Ordre dans la catégorie" className="w-40 rounded-lg border border-navy-900/15 px-3 py-2.5 text-sm" />
+          <Button onClick={handleAddFaq}>Ajouter</Button>
+        </div>
+        <ul className="flex flex-col divide-y divide-navy-900/10">
+          {faqs.map((f) => (
+            <li key={f.id} className="flex items-start justify-between gap-4 py-3">
+              <div>
+                <span className="mr-2 rounded-full bg-medical-50 px-2 py-0.5 text-[11px] font-semibold text-medical-600">{f.category}</span>
+                <p className="mt-1 text-sm font-medium text-navy-900">{f.question}</p>
+                <p className="mt-0.5 text-xs text-navy-900/50">{f.answer}</p>
+              </div>
+              <button onClick={() => deleteFaqItem(f.id).then(loadData)} className="shrink-0 text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
+            </li>
+          ))}
+          {faqs.length === 0 && <p className="py-3 text-sm text-navy-900/40">Aucune question.</p>}
         </ul>
       </section>
     </div>
