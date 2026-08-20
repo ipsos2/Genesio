@@ -13,7 +13,10 @@ const links = [
   { href: "/ufr-sciences-de-la-sante", label: "UFR Sciences de la Santé" },
   { href: "/ephr-san-pedro", label: "EPHR de San Pedro" },
   { href: "/calendrier-universitaire", label: "Calendrier Universitaire" },
+  { href: "/faq", label: "FAQ" },
 ];
+
+
 
 export function SiteHeader({ newsItems }: { newsItems: NewsItem[] }) {
   const [open, setOpen] = useState(false);
