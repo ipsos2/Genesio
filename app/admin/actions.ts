@@ -10,7 +10,7 @@ export async function checkAdminPassword(password: string) {
 export async function fetchAdminData() {
   const [newsRes, eventsRes, teachersRes, govRes] = await Promise.all([
     supabaseAdmin.from("news_items").select("id, type, text").order("created_at", { ascending: false }),
-    supabaseAdmin.from("calendar_events").select("id, event_date, label, tone").order("event_date", { ascending: true }),
+    supabaseAdmin.from("calendar_events").select("id, event_date, end_date, label, level, category").order("event_date", { ascending: true }),
     supabaseAdmin.from("teachers").select("id, name, grade, discipline, service, email").order("created_at", { ascending: false }),
     supabaseAdmin.from("governance").select("id, role, name, position").order("position", { ascending: true }),
   ]);
@@ -26,6 +26,7 @@ function revalidateAll() {
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/ufr-sciences-de-la-sante");
+  revalidatePath("/calendrier-universitaire");
 }
 
 export async function addNewsItem(type: string, text: string) {
@@ -43,9 +44,30 @@ export async function deleteNewsItem(id: string) {
   return { error: null };
 }
 
-export async function addCalendarEvent(event_date: string, label: string, tone: string) {
+const categoryToTone: Record<string, string> = {
+  rentree: "academique",
+  stage: "info",
+  examen: "urgent",
+  conge: "info",
+};
+
+export async function addCalendarEvent(
+  event_date: string,
+  end_date: string,
+  label: string,
+  level: string,
+  category: string
+) {
   if (!event_date || !label) return { error: "Champs manquants" };
-  const { error } = await supabaseAdmin.from("calendar_events").insert({ event_date, label, tone });
+  const tone = categoryToTone[category] ?? "info";
+  const { error } = await supabaseAdmin.from("calendar_events").insert({
+    event_date,
+    end_date: end_date || null,
+    label,
+    level,
+    category,
+    tone,
+  });
   if (error) return { error: error.message };
   revalidateAll();
   return { error: null };
