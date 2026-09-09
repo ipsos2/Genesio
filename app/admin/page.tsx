@@ -18,7 +18,12 @@ import {
   deleteCourseFile,
   addFaqItem,
   deleteFaqItem,
+  importStudentEmails,
+  deleteStudentEmail,
+  addCrouMenuItem,
+  deleteCrouMenuItem,
 } from "./actions";
+
 
 type NewsRow = { id: string; type: string; text: string };
 type EventRow = { id: string; event_date: string; end_date: string | null; label: string; level: string; category: string };
@@ -46,6 +51,13 @@ export default function AdminPage() {
 
   const [news, setNews] = useState<NewsRow[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
+  
+  const [menu, setMenu] = useState<{ id: string; day: string; meal: string; dish: string }[]>([]);
+  const [mDay, setMDay] = useState("Lundi");
+  const [mMeal, setMMeal] = useState("Déjeuner");
+  const [mDish, setMDish] = useState("");
+  const [mPosition, setMPosition] = useState("0");
+
   const [teachers, setTeachers] = useState<TeacherRow[]>([]);
   const [governance, setGovernance] = useState<GovRow[]>([]);
   const [courses, setCourses] = useState<CourseRow[]>([]);
@@ -81,7 +93,7 @@ export default function AdminPage() {
   const [fAnswer, setFAnswer] = useState("");
   const [fPosition, setFPosition] = useState("0");
 
-  async function loadData() {
+    async function loadData() {
     setLoading(true);
     const data = await fetchAdminData();
     setNews(data.news as NewsRow[]);
@@ -90,8 +102,11 @@ export default function AdminPage() {
     setGovernance(data.governance as GovRow[]);
     setCourses(data.courses as CourseRow[]);
     setFaqs(data.faq as FaqRow[]);
+    setStudents(data.students as StudentRow[]);
+    setMenu(data.menu as { id: string; day: string; meal: string; dish: string }[]);
     setLoading(false);
   }
+
 
   useEffect(() => {
     if (sessionStorage.getItem("admin_ok") === "1") {
@@ -126,6 +141,15 @@ export default function AdminPage() {
     const res = await addCalendarEvent(eventDate, eventEndDate, eventLabel, eventLevel, eventCategory);
     if (res?.error) return setActionError(res.error);
     setEventLabel(""); setEventDate(""); setEventEndDate("");
+    loadData();
+  }
+
+  async function handleAddMenu() {
+    if (!mDish.trim()) return;
+    setActionError("");
+    const res = await addCrouMenuItem(mDay, mMeal, mDish, parseInt(mPosition || "0", 10));
+    if (res?.error) return setActionError(res.error);
+    setMDish(""); setMPosition("0");
     loadData();
   }
 
