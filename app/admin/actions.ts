@@ -8,13 +8,15 @@ export async function checkAdminPassword(password: string) {
 }
 
 export async function fetchAdminData() {
-  const [newsRes, eventsRes, teachersRes, govRes, coursesRes, faqRes] = await Promise.all([
+  const [newsRes, eventsRes, teachersRes, govRes, coursesRes, faqRes, studentsRes, menuRes] = await Promise.all([
     supabaseAdmin.from("news_items").select("id, type, text").order("created_at", { ascending: false }),
     supabaseAdmin.from("calendar_events").select("id, event_date, end_date, label, level, category").order("event_date", { ascending: true }),
     supabaseAdmin.from("teachers").select("id, name, grade, discipline, service, email").order("created_at", { ascending: false }),
     supabaseAdmin.from("governance").select("id, role, name, position").order("position", { ascending: true }),
     supabaseAdmin.from("course_files").select("id, level, ue, module, title, file_url").order("created_at", { ascending: false }),
     supabaseAdmin.from("faq_items").select("id, category, question, answer, position").order("position", { ascending: true }),
+    supabaseAdmin.from("students").select("id, email").order("email", { ascending: true }),
+    supabaseAdmin.from("crou_menu").select("id, day, meal, dish, position").order("position", { ascending: true }),
   ]);
   return {
     news: newsRes.data ?? [],
@@ -23,8 +25,11 @@ export async function fetchAdminData() {
     governance: govRes.data ?? [],
     courses: coursesRes.data ?? [],
     faq: faqRes.data ?? [],
+    students: studentsRes.data ?? [],
+    menu: menuRes.data ?? [],
   };
 }
+
 
 function revalidateAll() {
   revalidatePath("/");
@@ -33,7 +38,9 @@ function revalidateAll() {
   revalidatePath("/calendrier-universitaire");
   revalidatePath("/espace-etudiant");
   revalidatePath("/faq");
+  revalidatePath("/restaurant-universitaire");
 }
+
 
 export async function addNewsItem(type: string, text: string) {
   if (!text) return { error: "Texte manquant" };
@@ -133,6 +140,13 @@ export async function addFaqItem(category: string, question: string, answer: str
 
 export async function deleteFaqItem(id: string) {
   const { error } = await supabaseAdmin.from("faq_items").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidateAll();
+  return { error: null };
+}
+export async function addCrouMenuItem(day: string, meal: string, dish: string, position: number) {
+  if (!day || !meal || !dish) return { error: "Champs manquants" };
+  const { error } = await supabaseAdmin.from("crou_menu").insert({ day, meal, dish, position });
   if (error) return { error: error.message };
   revalidateAll();
   return { error: null };
