@@ -86,3 +86,20 @@ export async function fetchFaqItems(): Promise<FaqItem[]> {
   if (error || !data) return [];
   return data as FaqItem[];
 }
+export type CrouMenuItem = {
+  id: string;
+  day: string;
+  meal: string;
+  dish: string;
+  position: number;
+};
+
+export async function fetchCrouMenu(): Promise<CrouMenuItem[]> {
+  const { data, error } = await supabase
+    .from("crou_menu")
+    .select("id, day, meal, dish, position")
+    .order("position", { ascending: true });
+  if (error || !data) return [];
+  return data as CrouMenuItem[];
+}
+
