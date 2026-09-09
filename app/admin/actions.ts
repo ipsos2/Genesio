@@ -137,3 +137,18 @@ export async function deleteFaqItem(id: string) {
   revalidateAll();
   return { error: null };
 }
+export async function addCrouMenuItem(day: string, meal: string, dish: string, position: number) {
+  if (!day || !meal || !dish) return { error: "Champs manquants" };
+  const { error } = await supabaseAdmin.from("crou_menu").insert({ day, meal, dish, position });
+  if (error) return { error: error.message };
+  revalidateAll();
+  return { error: null };
+}
+
+export async function deleteCrouMenuItem(id: string) {
+  const { error } = await supabaseAdmin.from("crou_menu").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidateAll();
+  return { error: null };
+}
+
